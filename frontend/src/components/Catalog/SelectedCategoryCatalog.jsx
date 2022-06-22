@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, NavLink, useParams } from 'react-router-dom';
 import {
-  fetchAllItemsRequest,
   fetchCategoriesRequest,
   fetchSelectedCategoryItemsRequest,
 } from '../../redux/actions/actionCreators';
@@ -10,9 +9,7 @@ import Banner from '../Banner/Banner';
 import Footer from '../Footer/Footer';
 import Header from '../Header/Header';
 const SelectedCategoryCatalog = () => {
-  const { categories, catalog, loading, error } = useSelector(
-    (state) => state.catalog
-  );
+  const { categories, catalog } = useSelector((state) => state.catalog);
   const dispatch = useDispatch();
   const { categoryId } = useParams();
 
@@ -47,7 +44,7 @@ const SelectedCategoryCatalog = () => {
                 {categories.map((el) => (
                   <li className='nav-item' key={el.id}>
                     <NavLink
-                      to={`/catalog.html/${el.id}`}
+                      to={`?categoryId=${el.id}`}
                       className={({ isActive }) =>
                         isActive ? 'nav-link active' : 'nav-link'
                       }

@@ -1,10 +1,12 @@
 import {
   FETCH_ALL_ITEMS_REQUEST,
   FETCH_ALL_ITEMS_SUCCESS,
-  FETCH_CATEGORIES_FAILURE,
+  FETCH_FAILURE,
   FETCH_CATEGORIES_REQUEST,
   FETCH_CATEGORIES_SUCCESS,
   FETCH_SELECTED_CATEGORY_ITEMS_REQUEST,
+  FETCH_LOAD_MORE_ITEMS_REQUEST,
+  FETCH_LOAD_MORE_ITEMS_SUCCESS,
 } from '../actions/actionTypes';
 
 const initialState = {
@@ -22,7 +24,7 @@ const catalogReducer = (state = initialState, action) => {
         loading: true,
         error: null,
       };
-    case FETCH_CATEGORIES_FAILURE:
+    case FETCH_FAILURE:
       const { error } = action.payload;
       return {
         ...state,
@@ -56,6 +58,18 @@ const catalogReducer = (state = initialState, action) => {
         ...state,
         loading: true,
         error: null,
+      };
+    case FETCH_LOAD_MORE_ITEMS_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case FETCH_LOAD_MORE_ITEMS_SUCCESS:
+      const { loadedItems } = action.payload;
+      return {
+        ...state,
+        // catalog.concat(loadedItems)
       };
     default:
       return state;

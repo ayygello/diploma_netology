@@ -1,15 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
-import catalogReducer from '../reducers/catalog';
-import topSalesReducer from '../reducers/topSales';
+import catalogSlice from '../features/catalog/catalogSlice';
+import topSalesSlice from '../features/topSales/topSalesSlice';
+// import catalogReducer from '../reducers/catalog';
+// import topSalesReducer from '../reducers/topSales';
 import saga from '../sagas';
 
 const sagaMiddleWare = createSagaMiddleware();
 
 const store = configureStore({
   reducer: {
-    topSales: topSalesReducer,
-    catalog: catalogReducer,
+    topSales: topSalesSlice,
+    catalog: catalogSlice,
   },
   middleware: [sagaMiddleWare],
 });

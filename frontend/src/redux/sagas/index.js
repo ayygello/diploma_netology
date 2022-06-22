@@ -2,28 +2,45 @@ import { put, retry, spawn, takeEvery } from 'redux-saga/effects';
 import {
   fetchAllItemsSuccess,
   fetchCategoriesFailure,
-  fetchCategoriesSuccess,
-  fetchTopSalesFailure,
-  fetchTopSalesSuccess,
+  // fetchCategoriesSuccess,
+  // fetchTopSalesFailure,
+  // fetchTopSalesSuccess,
 } from '../actions/actionCreators';
 import {
   FETCH_ALL_ITEMS_REQUEST,
   FETCH_CATEGORIES_REQUEST,
-  FETCH_SELECTED_CATEGORY_ITEMS_REQUEST,
+  FETCH_SELECTED_ITEMS_REQUEST,
   FETCH_TOP_SALES_REQUEST,
 } from '../actions/actionTypes';
 import {
   fetchAllItems,
   fetchCategories,
+  fetchLoadMoreItems,
   fetchSelectedItems,
   fetchTopSales,
 } from '../api';
+import {
+  fetchCategoriesRequest,
+  fetchCategoriesSuccess,
+  fetchFailure,
+  fetchItemsRequest,
+  fetchItemsSuccess,
+  fetchRequest,
+  fetchSelectedItemsRequest,
+  fetchSelectedItemsSuccess,
+} from '../features/catalog/catalogSlice';
+import {
+  fetchTopSalesFailure,
+  fetchTopSalesRequest,
+  fetchTopSalesSuccess,
+} from '../features/topSales/topSalesSlice';
 
-// worker
+const retryCount = 3;
+const retryDelay = 1 * 1000;
+
+// topSales worker
 function* handleFetchTopSalesSaga() {
   try {
-    const retryCount = 3;
-    const retryDelay = 1 * 1000;
     const data = yield retry(retryCount, retryDelay, fetchTopSales);
     yield put(fetchTopSalesSuccess(data));
   } catch (e) {
@@ -31,66 +48,65 @@ function* handleFetchTopSalesSaga() {
   }
 }
 
-// watcher
 function* watchFetchTopSalesSaga() {
-  yield takeEvery(FETCH_TOP_SALES_REQUEST, handleFetchTopSalesSaga);
+  yield takeEvery(fetchTopSalesRequest, handleFetchTopSalesSaga);
 }
 
-// worker
+// Categories worker
 function* handleFetchCategoriesSaga() {
   try {
-    const retryCount = 3;
-    const retryDelay = 1 * 1000;
     const data = yield retry(retryCount, retryDelay, fetchCategories);
     yield put(fetchCategoriesSuccess(data));
   } catch (e) {
-    yield put(fetchCategoriesFailure(e.message));
+    yield put(fetchFailure(e.message));
   }
 }
 
-// watcher
 function* watchFetchCategoriesSaga() {
-  yield takeEvery(FETCH_CATEGORIES_REQUEST, handleFetchCategoriesSaga);
+  yield takeEvery(fetchCategoriesRequest, handleFetchCategoriesSaga);
 }
 
-// worker
+// All items worker
 function* handleFetchFullCatalogSaga() {
   try {
-    const retryCount = 3;
-    const retryDelay = 1 * 1000;
     const data = yield retry(retryCount, retryDelay, fetchAllItems);
-    yield put(fetchAllItemsSuccess(data));
+    yield put(fetchItemsSuccess(data));
   } catch (e) {
-    yield put(fetchCategoriesFailure(e.message));
+    yield put(fetchFailure(e.message));
   }
 }
 
-// watcher
 function* watchFetchAllCatalogSaga() {
-  yield takeEvery(FETCH_ALL_ITEMS_REQUEST, handleFetchFullCatalogSaga);
+  yield takeEvery(fetchItemsRequest, handleFetchFullCatalogSaga);
 }
 
 function* handleFetchSelectedCatalogSaga(action) {
   try {
-    const retryCount = 3;
-    const retryDelay = 1 * 1000;
     const data = yield retry(
       retryCount,
       retryDelay,
       fetchSelectedItems,
-      action.payload.id
+      action.payload.catalogId
     );
-    yield put(fetchAllItemsSuccess(data));
+    yield put(fetchSelectedItemsSuccess(data));
   } catch (e) {
-    yield put(fetchCategoriesFailure(e.message));
+    yield put(fetchFailure(e.message));
   }
 }
 
+// function* handleLoadMoreItemsSaga() {
+//   try {
+//     const data = yield retry(
+//       retryCount,
+//       retryDelay,
+//       fetchLoadMoreItems
+//     );
+//     yield put(fe)
+//   }
+// }
+
 function* watchFetchSelectedCatalogSaga() {
-  yield takeEvery(
-    FETCH_SELECTED_CATEGORY_ITEMS_REQUEST,
-    handleFetchSelectedCatalogSaga
-  );
+  yield takeEvery(fetchSelectedItemsRequest, handleFetchSelectedCatalogSaga);
 }
 
 export default function* saga() {

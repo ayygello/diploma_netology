@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTopSalesRequest } from '../../redux/actions/actionCreators';
+import { fetchTopSalesRequest } from '../../redux/features/topSales/topSalesSlice';
 
 const TopSales = () => {
-  const { items, loading, error } = useSelector((state) => state.topSales);
+  const { items } = useSelector((state) => state.topSales);
   const dispatch = useDispatch();
-  const [hotSales, setHotSales] = useState([]);
 
   useEffect(() => {
     dispatch(fetchTopSalesRequest());
   }, [dispatch]);
-
-  // console.log({ items });
-  // console.log(hotSales);
 
   return (
     <>
