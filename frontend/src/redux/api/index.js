@@ -27,17 +27,36 @@ export const fetchAllItems = async () => {
 };
 
 export const fetchSelectedItems = async (id) => {
-  const response = await axios.get(`/items/?categoryId=${id}`);
+  const response = await axios.get('/items/', {
+    params: { categoryId: id },
+  });
   if (response.ok) {
     throw new Error(response.statusText);
   }
   return await response.data;
 };
 
-export const fetchLoadMoreItems = async () => {
+export const fetchLoadMoreItems = async (count) => {
   const response = await axios.get('/items', {
-    params: { offset: 6 },
+    params: { offset: count },
   });
+  if (response.ok) {
+    throw new Error(response.statusText);
+  }
+  return await response.data;
+};
+
+export const fetchLoadMoreSelectedItems = async (id, count) => {
+  const response = await axios.get(`/items?categoryId=${id}&offset=${count}`);
+  if (response.ok) {
+    throw new Error(response.statusText);
+  }
+  return await response.data;
+};
+
+export const searchProducts = async (search) => {
+  const params = new URLSearchParams({ q: search });
+  const response = await axios.get(`http://localhost:7070/api/items?${params}`);
   if (response.ok) {
     throw new Error(response.statusText);
   }

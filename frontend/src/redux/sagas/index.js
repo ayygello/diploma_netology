@@ -1,33 +1,24 @@
-import { put, retry, spawn, takeEvery } from 'redux-saga/effects';
-import {
-  fetchAllItemsSuccess,
-  fetchCategoriesFailure,
-  // fetchCategoriesSuccess,
-  // fetchTopSalesFailure,
-  // fetchTopSalesSuccess,
-} from '../actions/actionCreators';
-import {
-  FETCH_ALL_ITEMS_REQUEST,
-  FETCH_CATEGORIES_REQUEST,
-  FETCH_SELECTED_ITEMS_REQUEST,
-  FETCH_TOP_SALES_REQUEST,
-} from '../actions/actionTypes';
+import { debounce, put, retry, spawn, takeEvery } from 'redux-saga/effects';
 import {
   fetchAllItems,
   fetchCategories,
   fetchLoadMoreItems,
   fetchSelectedItems,
   fetchTopSales,
+  searchProducts,
 } from '../api';
 import {
+  changeSearchField,
   fetchCategoriesRequest,
   fetchCategoriesSuccess,
   fetchFailure,
   fetchItemsRequest,
   fetchItemsSuccess,
-  fetchRequest,
+  fetchLoadMoreRequest,
+  fetchLoadMoreSuccess,
   fetchSelectedItemsRequest,
   fetchSelectedItemsSuccess,
+  searchProductsSuccess,
 } from '../features/catalog/catalogSlice';
 import {
   fetchTopSalesFailure,
@@ -86,7 +77,7 @@ function* handleFetchSelectedCatalogSaga(action) {
       retryCount,
       retryDelay,
       fetchSelectedItems,
-      action.payload.catalogId
+      action.payload
     );
     yield put(fetchSelectedItemsSuccess(data));
   } catch (e) {
@@ -94,19 +85,39 @@ function* handleFetchSelectedCatalogSaga(action) {
   }
 }
 
-// function* handleLoadMoreItemsSaga() {
-//   try {
-//     const data = yield retry(
-//       retryCount,
-//       retryDelay,
-//       fetchLoadMoreItems
-//     );
-//     yield put(fe)
-//   }
-// }
-
 function* watchFetchSelectedCatalogSaga() {
   yield takeEvery(fetchSelectedItemsRequest, handleFetchSelectedCatalogSaga);
+}
+
+function* handleLoadMoreItemsSaga(action) {
+  try {
+    const data = yield retry(
+      retryCount,
+      retryDelay,
+      fetchLoadMoreItems,
+      action.payload
+    );
+    yield put(fetchLoadMoreSuccess(data));
+  } catch (e) {
+    yield put(fetchFailure(e.message));
+  }
+}
+
+function* wathcFetchLoadMoreItemsSaga() {
+  yield takeEvery(fetchLoadMoreRequest, handleLoadMoreItemsSaga);
+}
+
+function* handleSearchProductsSaga(action) {
+  try {
+    const data = yield retry(retry, retryDelay, searchProducts, action.payload);
+    yield put(searchProductsSuccess(data));
+  } catch (e) {
+    yield put(fetchFailure(e.message));
+  }
+}
+
+function* watchSearchProductsSaga() {
+  yield debounce(500, changeSearchField, handleSearchProductsSaga);
 }
 
 export default function* saga() {
@@ -114,4 +125,6 @@ export default function* saga() {
   yield spawn(watchFetchCategoriesSaga);
   yield spawn(watchFetchAllCatalogSaga);
   yield spawn(watchFetchSelectedCatalogSaga);
+  yield spawn(wathcFetchLoadMoreItemsSaga);
+  yield spawn(watchSearchProductsSaga);
 }
